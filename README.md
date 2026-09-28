@@ -1,9 +1,17 @@
-# ZELIO
+# ZELIO Next.js
 
-Interactive landing page for ZELIO — an AI operating system for solo founders.
+Converted from the supplied ZELIO.html into a Next.js App Router project.
 
-## Stack
-- Next.js 16 App Router
-- React 19
-- TypeScript
-- CSS/SVG animation
+## Run
+
+```bash
+npm install
+npm run dev
+```
+
+## Production
+
+```bash
+npm run build
+npm start
+```
