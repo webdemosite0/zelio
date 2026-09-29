@@ -14,7 +14,7 @@ export default function AgentCard({
   const waiting = agent.status === "waiting";
 
   return (
-    <article className="group relative rounded-2xl border border-ink/[0.07] bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_-20px_rgba(17,18,26,0.25)]">
+    <article className="group relative rounded-2xl border border-[#e7e9ef] bg-white shadow-[0_1px_2px_rgba(17,18,26,.025)] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d9dce5] hover:shadow-[0_12px_32px_-18px_rgba(17,18,26,.24)]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span
