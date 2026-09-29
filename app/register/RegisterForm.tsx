@@ -29,7 +29,7 @@ export default function RegisterForm() {
     });
 
     if (res.ok) {
-      router.push("/dashboard");
+      router.push("/onboarding");
       router.refresh();
       return;
     }
