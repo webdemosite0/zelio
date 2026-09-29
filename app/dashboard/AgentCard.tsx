@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Agent } from "./types";
 import ApproveButton from "./ApproveButton";
 
@@ -13,7 +14,7 @@ export default function AgentCard({
   const waiting = agent.status === "waiting";
 
   return (
-    <article className="group rounded-2xl border border-ink/[0.07] bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_-20px_rgba(17,18,26,0.25)]">
+    <article className="group relative rounded-2xl border border-ink/[0.07] bg-white p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_16px_36px_-20px_rgba(17,18,26,0.25)]">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span
@@ -68,6 +69,7 @@ export default function AgentCard({
           </p>
         </div>
       )}
+    <Link href={`/dashboard/agents/${agent.id}`} aria-label={`Open ${agent.name} workspace`} className="absolute inset-0 rounded-2xl focus:outline-none focus:ring-2 focus:ring-electric-violet/40"><span className="sr-only">Open {agent.name}</span></Link>
     </article>
   );
 }
