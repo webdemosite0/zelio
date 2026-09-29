@@ -119,14 +119,14 @@ export default function DashboardClient({ userName }: { userName: string }) {
           <p className="mt-2 text-[15px] text-muted">Your company is making progress.</p>
 
           {error ? (
-            <div className="mt-8 premium-card rounded-2xl p-8 text-center">
+            <div className="mt-8 premium-card rounded-[14px] p-8 text-center">
               <p className="text-sm font-medium text-ink/80">
                 Couldn't load your company data.
               </p>
               <button
                 type="button"
                 onClick={load}
-                className="mt-4 rounded-xl bg-ink px-5 py-2.5 text-sm font-semibold text-white transition-transform duration-150 active:scale-[0.98]"
+                className="mt-4 rounded-[10px] bg-ink px-5 py-2.5 text-sm font-semibold text-white transition-transform duration-150 active:scale-[0.98]"
               >
                 Try again
               </button>
@@ -136,7 +136,7 @@ export default function DashboardClient({ userName }: { userName: string }) {
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-36 animate-pulse premium-card rounded-2xl"
+                  className="h-36 animate-pulse premium-card rounded-[14px]"
                 />
               ))}
             </div>
@@ -158,7 +158,7 @@ export default function DashboardClient({ userName }: { userName: string }) {
 
               {/* Activity + Up next */}
               <section className="mt-4 grid gap-4 lg:grid-cols-2">
-                <div className="premium-card rounded-2xl p-6">
+                <div className="premium-card rounded-[14px] p-6">
                   <h2 className="text-base font-bold tracking-tight text-ink">
                     Recent activity
                   </h2>
@@ -199,14 +199,14 @@ export default function DashboardClient({ userName }: { userName: string }) {
                   )}
                 </div>
 
-                <div className="premium-card rounded-2xl p-6">
+                <div className="premium-card rounded-[14px] p-6">
                   <h2 className="text-base font-bold tracking-tight text-ink">Up next</h2>
                   <p className="mt-1 text-sm text-muted">Decisions waiting on you.</p>
                   <div className="mt-3">
                     {tasks === null ? (
                       <div className="flex animate-pulse flex-col gap-3" aria-hidden="true">
                         {Array.from({ length: 4 }).map((_, i) => (
-                          <div key={i} className="h-8 rounded-xl bg-mist" />
+                          <div key={i} className="h-8 rounded-[10px] bg-mist" />
                         ))}
                       </div>
                     ) : (
