@@ -75,7 +75,7 @@ export default function CommandBar({
   return (
     <div className="space-y-3">
       {(sending || answer || error) && (
-        <section className="overflow-hidden rounded-3xl border border-electric-violet/15 bg-white shadow-[0_24px_70px_-38px_rgba(97,87,255,0.55)]">
+        <section className="overflow-hidden rounded-[18px] border border-electric-violet/15 bg-white shadow-[0_24px_70px_-38px_rgba(97,87,255,0.55)]">
           <div className="flex items-center justify-between border-b border-ink/[0.06] bg-gradient-to-r from-electric-blue/[0.08] via-plasma-purple/[0.08] to-hot-pink/[0.08] px-5 py-3.5">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2.5 w-2.5">
@@ -109,9 +109,9 @@ export default function CommandBar({
 
       <form
         onSubmit={onSubmit}
-        className="flex items-center gap-3 rounded-2xl border border-electric-violet/15 bg-white p-2.5 pl-3 shadow-[0_18px_50px_-28px_rgba(97,87,255,0.5)] transition-all duration-200 focus-within:border-electric-violet/35 focus-within:shadow-[0_24px_60px_-26px_rgba(97,87,255,0.55)]"
+        className="flex items-center gap-3 rounded-[14px] border border-electric-violet/15 bg-white p-2.5 pl-3 shadow-[0_18px_50px_-28px_rgba(97,87,255,0.5)] transition-all duration-200 focus-within:border-electric-violet/35 focus-within:shadow-[0_24px_60px_-26px_rgba(97,87,255,0.55)]"
       >
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-electric-blue via-electric-violet to-hot-pink text-white shadow-sm">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-gradient-to-br from-electric-blue via-electric-violet to-hot-pink text-white shadow-sm">
           <svg viewBox="0 0 20 20" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M10 2.5v3M10 14.5v3M2.5 10h3M14.5 10h3M4.7 4.7l2.1 2.1M13.2 13.2l2.1 2.1M15.3 4.7l-2.1 2.1M6.8 13.2l-2.1 2.1" />
           </svg>
@@ -128,7 +128,7 @@ export default function CommandBar({
           type="submit"
           aria-label="Send command"
           disabled={sending || !value.trim()}
-          className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-xl bg-ink px-4 text-sm font-bold text-white transition-all duration-150 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 disabled:translate-y-0 disabled:opacity-50"
+          className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-[10px] bg-ink px-4 text-sm font-bold text-white transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[var(--z-shadow-mid)] active:scale-95 disabled:translate-y-0 disabled:opacity-50"
         >
           {sending ? "Working" : "Run"}
           <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
