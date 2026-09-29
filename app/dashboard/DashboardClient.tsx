@@ -8,76 +8,6 @@ import CommandBar from "./CommandBar";
 import type { Agent, TaskItem, ActivityItem } from "./types";
 import { timeAgo } from "./types";
 
-function NavIcon({ d }: { d: React.ReactNode }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      className="h-[18px] w-[18px]"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      {d}
-    </svg>
-  );
-}
-
-const NAV = [
-  {
-    label: "HQ",
-    active: true,
-    icon: (
-      <>
-        <rect x="3.5" y="3.5" width="7" height="7" rx="1.8" />
-        <rect x="13.5" y="3.5" width="7" height="7" rx="1.8" />
-        <rect x="3.5" y="13.5" width="7" height="7" rx="1.8" />
-        <rect x="13.5" y="13.5" width="7" height="7" rx="1.8" />
-      </>
-    ),
-  },
-  {
-    label: "Team",
-    active: false,
-    icon: (
-      <>
-        <circle cx="9" cy="8" r="3.4" />
-        <path d="M3.5 19.5c.6-3.2 2.9-4.8 5.5-4.8s4.9 1.6 5.5 4.8" />
-        <path d="M15.5 5.3a3.4 3.4 0 0 1 0 5.7M18.3 15.2c1.3.8 2.1 2 2.4 3.8" />
-      </>
-    ),
-  },
-  {
-    label: "Work",
-    active: false,
-    icon: (
-      <>
-        <rect x="4" y="4" width="16" height="16" rx="3.5" />
-        <path d="m8.6 12.4 2.4 2.4 4.4-4.9" />
-      </>
-    ),
-  },
-  {
-    label: "Files",
-    active: false,
-    icon: (
-      <path d="M3.5 7.2a2 2 0 0 1 2-2h4l2 2.6h7a2 2 0 0 1 2 2v6.4a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2V7.2z" />
-    ),
-  },
-  {
-    label: "Growth",
-    active: false,
-    icon: (
-      <>
-        <path d="M3.5 17.5 9.2 12l3.4 3.4 7.9-8.4" />
-        <path d="M15 7h5.5v5.5" />
-      </>
-    ),
-  },
-];
-
 async function getJSON<T>(url: string): Promise<T> {
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`Request failed: ${url}`);
@@ -292,8 +222,4 @@ export default function DashboardClient({ userName }: { userName: string }) {
               </div>
             </>
           )}
-        </main>
-      </div>
-    </div>
-  );
-}
+    </main>\n  );\n}
