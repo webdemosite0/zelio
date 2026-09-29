@@ -14,12 +14,12 @@ export default function AgentCard({
   const waiting = agent.status === "waiting";
 
   return (
-    <article className="group relative rounded-2xl border border-[#e7e9ef] bg-white shadow-[0_1px_2px_rgba(17,18,26,.025)] p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#d9dce5] hover:shadow-[0_12px_32px_-18px_rgba(17,18,26,.24)]">
+    <article className="premium-card group relative overflow-hidden rounded-2xl p-5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span
             aria-hidden="true"
-            className="h-2.5 w-2.5 rounded-full"
+            className="h-2.5 w-2.5 rounded-full transition-transform duration-300 group-hover:scale-125"
             style={{ backgroundColor: agent.color }}
           />
           <h3 className="text-[15px] font-bold tracking-tight text-ink">
@@ -69,7 +69,7 @@ export default function AgentCard({
           </p>
         </div>
       )}
-    <Link href={`/dashboard/agents/${agent.id}`} aria-label={`Open ${agent.name} workspace`} className="absolute inset-0 rounded-2xl focus:outline-none focus:ring-2 focus:ring-electric-violet/40"><span className="sr-only">Open {agent.name}</span></Link>
+    <Link href={`/dashboard/agents/${agent.id}`} className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold text-muted transition hover:text-ink">Open workspace <span className="transition-transform group-hover:translate-x-0.5">→</span></Link>
     </article>
   );
 }
