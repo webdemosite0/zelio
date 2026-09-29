@@ -112,14 +112,14 @@ export default function DashboardClient({ userName }: { userName: string }) {
     <div className="flex min-h-screen text-ink">
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Content */}
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
+        <main className="page-enter mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
           <h1 className="text-[32px] font-semibold tracking-[-.035em] text-ink sm:text-4xl">
             {greeting}, {firstName}.
           </h1>
           <p className="mt-2 text-[15px] text-muted">Your company is making progress.</p>
 
           {error ? (
-            <div className="mt-8 rounded-2xl border border-[#e7e9ef] bg-white shadow-[0_1px_2px_rgba(17,18,26,.025)] p-8 text-center">
+            <div className="mt-8 premium-card rounded-2xl p-8 text-center">
               <p className="text-sm font-medium text-ink/80">
                 Couldn't load your company data.
               </p>
@@ -136,7 +136,7 @@ export default function DashboardClient({ userName }: { userName: string }) {
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-36 animate-pulse rounded-2xl border border-[#e7e9ef] bg-white shadow-[0_1px_2px_rgba(17,18,26,.025)]"
+                  className="h-36 animate-pulse premium-card rounded-2xl"
                 />
               ))}
             </div>
@@ -158,7 +158,7 @@ export default function DashboardClient({ userName }: { userName: string }) {
 
               {/* Activity + Up next */}
               <section className="mt-4 grid gap-4 lg:grid-cols-2">
-                <div className="rounded-2xl border border-[#e7e9ef] bg-white shadow-[0_1px_2px_rgba(17,18,26,.025)] p-6">
+                <div className="premium-card rounded-2xl p-6">
                   <h2 className="text-base font-bold tracking-tight text-ink">
                     Recent activity
                   </h2>
@@ -199,7 +199,7 @@ export default function DashboardClient({ userName }: { userName: string }) {
                   )}
                 </div>
 
-                <div className="rounded-2xl border border-[#e7e9ef] bg-white shadow-[0_1px_2px_rgba(17,18,26,.025)] p-6">
+                <div className="premium-card rounded-2xl p-6">
                   <h2 className="text-base font-bold tracking-tight text-ink">Up next</h2>
                   <p className="mt-1 text-sm text-muted">Decisions waiting on you.</p>
                   <div className="mt-3">
