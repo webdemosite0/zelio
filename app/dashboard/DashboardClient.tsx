@@ -108,122 +108,22 @@ export default function DashboardClient({ userName }: { userName: string }) {
   const greeting =
     hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
+  const doneCount=tasks?.filter(t=>t.done).length??0;
+  const waitingCount=agents?.filter(a=>a.status==="waiting").length??0;
   return (
-    <div className="flex min-h-screen text-ink">
-      <div className="flex min-w-0 flex-1 flex-col">
-        {/* Content */}
-        <main className="page-enter mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-          <h1 className="text-[32px] font-semibold tracking-[-.035em] text-ink sm:text-4xl">
-            {greeting}, {firstName}.
-          </h1>
-          <p className="mt-2 text-[15px] text-muted">Your company is making progress.</p>
-
-          {error ? (
-            <div className="mt-8 premium-card rounded-[14px] p-8 text-center">
-              <p className="text-sm font-medium text-ink/80">
-                Couldn't load your company data.
-              </p>
-              <button
-                type="button"
-                onClick={load}
-                className="mt-4 rounded-[10px] bg-ink px-5 py-2.5 text-sm font-semibold text-white transition-transform duration-150 active:scale-[0.98]"
-              >
-                Try again
-              </button>
-            </div>
-          ) : agents === null ? (
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-hidden="true">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-36 animate-pulse premium-card rounded-[14px]"
-                />
-              ))}
-            </div>
-          ) : (
-            <>
-              {/* Agent grid */}
-              <section aria-label="Your AI team" className="mt-8">
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {agents.map((agent) => (
-                    <AgentCard
-                      key={agent.id}
-                      agent={agent}
-                      onApprove={approveAgent}
-                      approving={approvingId === agent.id}
-                    />
-                  ))}
-                </div>
-              </section>
-
-              {/* Activity + Up next */}
-              <section className="mt-4 grid gap-4 lg:grid-cols-2">
-                <div className="premium-card rounded-[14px] p-6">
-                  <h2 className="text-base font-bold tracking-tight text-ink">
-                    Recent activity
-                  </h2>
-                  {activity === null ? (
-                    <div className="mt-4 flex animate-pulse flex-col gap-3" aria-hidden="true">
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <div key={i} className="h-4 rounded bg-mist" />
-                      ))}
-                    </div>
-                  ) : activity.length === 0 ? (
-                    <p className="mt-4 text-sm text-muted">Nothing yet — your team just got started.</p>
-                  ) : (
-                    <ul className="mt-4 flex flex-col">
-                      {activity.map((event, i) => (
-                        <li key={event.id}>
-                          <div className="flex items-start gap-3 py-2.5">
-                            <span
-                              aria-hidden="true"
-                              className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-                              style={{ backgroundColor: event.color ?? "#727586" }}
-                            />
-                            <p className="min-w-0 flex-1 text-sm text-ink/80">
-                              {event.agentName && (
-                                <span className="font-semibold text-ink">{event.agentName} </span>
-                              )}
-                              {event.text}
-                            </p>
-                            <span className="shrink-0 text-xs text-muted">
-                              {timeAgo(event.createdAt)}
-                            </span>
-                          </div>
-                          {i < activity.length - 1 && (
-                            <div aria-hidden="true" className="ml-[3px] h-px bg-ink/[0.06]" />
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-
-                <div className="premium-card rounded-[14px] p-6">
-                  <h2 className="text-base font-bold tracking-tight text-ink">Up next</h2>
-                  <p className="mt-1 text-sm text-muted">Decisions waiting on you.</p>
-                  <div className="mt-3">
-                    {tasks === null ? (
-                      <div className="flex animate-pulse flex-col gap-3" aria-hidden="true">
-                        {Array.from({ length: 4 }).map((_, i) => (
-                          <div key={i} className="h-8 rounded-[10px] bg-mist" />
-                        ))}
-                      </div>
-                    ) : (
-                      <UpNext tasks={tasks} onToggle={toggleTask} />
-                    )}
-                  </div>
-                </div>
-              </section>
-
-              {/* Command bar */}
-              <div className="mt-6">
-                <CommandBar onCommand={addTask} />
-              </div>
-            </>
-          )}
-        </main>
-      </div>
-    </div>
+    <main className="page-enter mx-auto w-full max-w-[1180px] px-5 py-8 sm:px-8 sm:py-10">
+      <section className="grid items-end gap-8 border-b border-[var(--z-line)] pb-8 lg:grid-cols-[1fr_380px]">
+        <div><p className="text-[11px] font-semibold uppercase tracking-[.14em] text-[#8a8798]">Company HQ</p><h1 className="mt-2 text-[36px] font-semibold leading-[1.02] tracking-[-.045em] sm:text-[44px]">{greeting}, {firstName}.</h1><p className="mt-3 max-w-xl text-[14px] leading-6 text-muted">Your AI team is operating from shared company context. Direct the company, review execution, and unblock decisions from one place.</p></div>
+        <div className="grid grid-cols-3 gap-5 border-l border-[var(--z-line)] pl-0 lg:pl-7"><div><p className="text-[11px] text-muted">Working</p><p className="mt-1 text-xl font-semibold">{agents?.filter(a=>a.status==="working").length??"—"}</p></div><div><p className="text-[11px] text-muted">Waiting</p><p className="mt-1 text-xl font-semibold">{agents?waitingCount:"—"}</p></div><div><p className="text-[11px] text-muted">Completed</p><p className="mt-1 text-xl font-semibold">{tasks?doneCount:"—"}</p></div></div>
+      </section>
+      <section className="mt-7"><CommandBar onCommand={addTask}/></section>
+      {error?<div className="mt-8 border-y border-[var(--z-line)] py-10 text-center"><p className="text-sm text-muted">Couldn't load your company data.</p><button onClick={load} className="z-button z-button-primary mt-4">Try again</button></div>:agents===null?<div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">{Array.from({length:6}).map((_,i)=><div key={i} className="h-40 animate-pulse rounded-[14px] bg-[#eff0f3]"/>)}</div>:<>
+        <section className="mt-10"><div className="mb-4 flex items-end justify-between"><div><p className="text-[11px] font-semibold uppercase tracking-[.13em] text-muted">AI team</p><h2 className="mt-1 text-[20px] font-semibold tracking-[-.025em]">Specialists at work</h2></div><span className="text-[11px] text-muted">{agents.length} specialists</span></div><div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{agents.map(agent=><AgentCard key={agent.id} agent={agent} onApprove={approveAgent} approving={approvingId===agent.id}/>)}</div></section>
+        <section className="mt-10 grid gap-10 border-t border-[var(--z-line)] pt-8 lg:grid-cols-[1.2fr_.8fr]">
+          <div><div className="flex items-center justify-between"><h2 className="text-[14px] font-semibold">Live company activity</h2><span className="text-[11px] text-muted">Latest</span></div>{activity===null?<div className="mt-4 h-28 animate-pulse bg-[#f1f2f4]"/>:activity.length===0?<p className="mt-5 text-sm text-muted">Your company activity will appear here.</p>:<ul className="mt-3">{activity.slice(0,7).map((event,i)=><li key={event.id} className="grid grid-cols-[12px_1fr_auto] gap-2 border-b border-[var(--z-line)] py-3"><span className="mt-1.5 h-1.5 w-1.5 rounded-full" style={{background:event.color??"#727586"}}/><p className="text-[12px] leading-5 text-ink/75">{event.agentName&&<b className="font-semibold text-ink">{event.agentName} · </b>}{event.text}</p><span className="text-[10px] text-muted">{timeAgo(event.createdAt)}</span></li>)}</ul>}</div>
+          <aside><h2 className="text-[14px] font-semibold">Founder queue</h2><p className="mt-1 text-[12px] text-muted">Work and decisions that need attention.</p><div className="mt-3 border-t border-[var(--z-line)] pt-2">{tasks===null?<div className="h-28 animate-pulse bg-[#f1f2f4]"/>:<UpNext tasks={tasks} onToggle={toggleTask}/>}</div></aside>
+        </section>
+      </>}
+    </main>
   );
 }
