@@ -1,293 +1,44 @@
-// SQLite data layer built on Node's built-in `node:sqlite` (no native deps,
-// no binary downloads). Tables are created idempotently on first import,
-// so `npm run db:push` and the running server always agree on the schema.
+import { neon } from "@neondatabase/serverless";
 
-import { DatabaseSync } from "node:sqlite";
-import path from "node:path";
-import { randomUUID } from "node:crypto";
-
-function resolveDbPath(): string {
-  const raw = process.env.DATABASE_URL ?? "file:./dev.db";
-  const p = raw.startsWith("file:") ? raw.slice("file:".length) : raw;
-  return path.isAbsolute(p) ? p : path.join(process.cwd(), p);
+function sql() {
+  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not configured.");
+  return neon(process.env.DATABASE_URL);
 }
 
-const globalForDb = globalThis as unknown as { __zelioDb?: DatabaseSync };
+const TEAM = [
+  ["Strategy", "#FFCB45"], ["Research", "#25E6DA"], ["Product", "#B642FF"],
+  ["Development", "#258BFF"], ["Marketing", "#FF3E9D"], ["Sales", "#FF7657"],
+] as const;
 
-function getDb(): DatabaseSync {
-  if (!globalForDb.__zelioDb) {
-    const sqlite = new DatabaseSync(resolveDbPath());
-    sqlite.exec(`
-      CREATE TABLE IF NOT EXISTS users (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL UNIQUE,
-        password_hash TEXT NOT NULL,
-        created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS agents (
-        id TEXT PRIMARY KEY,
-        name TEXT NOT NULL UNIQUE,
-        color TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'working',
-        current_task TEXT NOT NULL DEFAULT '',
-        progress INTEGER NOT NULL DEFAULT 0
-      );
-      CREATE TABLE IF NOT EXISTS tasks (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        done INTEGER NOT NULL DEFAULT 0,
-        agent_id TEXT,
-        created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS activity (
-        id TEXT PRIMARY KEY,
-        text TEXT NOT NULL,
-        agent_name TEXT,
-        color TEXT,
-        created_at TEXT NOT NULL
-      );
-    `);
-    globalForDb.__zelioDb = sqlite;
+export type DbAgent = { id:string; name:string; color:string; status:"working"|"waiting"; currentTask:string; progress:number };
+export type DbTask = { id:string; title:string; done:boolean; agentId:string|null; createdAt:string };
+export type DbActivity = { id:string; text:string; agentName:string|null; color:string|null; createdAt:string };
+
+async function companyFor(userId:string) {
+  const q=sql();
+  const rows=await q`insert into companies (owner_user_id, name) values (${userId}, 'My company')
+    on conflict (owner_user_id) do update set updated_at=now() returning id`;
+  const companyId=String(rows[0].id);
+  const count=await q`select count(*)::int as n from agents where company_id=${companyId}`;
+  if(Number(count[0].n)===0) {
+    for(const [role,accent] of TEAM) await q`insert into agents (company_id,role,status,current_task,progress,accent) values (${companyId},${role},'working','Ready for your next command',0,${accent})`;
   }
-  return globalForDb.__zelioDb;
+  return companyId;
 }
 
-export type DbUser = {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  createdAt: string;
-};
+const agent=(r:Record<string,unknown>):DbAgent=>({id:String(r.id),name:String(r.role),color:String(r.accent),status:r.status==="waiting"?"waiting":"working",currentTask:String(r.current_task??""),progress:Number(r.progress??0)});
+const task=(r:Record<string,unknown>):DbTask=>({id:String(r.id),title:String(r.title),done:r.status==="done",agentId:r.agent_id?String(r.agent_id):null,createdAt:new Date(String(r.created_at)).toISOString()});
+const activity=(r:Record<string,unknown>):DbActivity=>({id:String(r.id),text:String(r.message),agentName:r.kind?String(r.kind):null,color:null,createdAt:new Date(String(r.created_at)).toISOString()});
 
-export type DbAgent = {
-  id: string;
-  name: string;
-  color: string;
-  status: "working" | "waiting";
-  currentTask: string;
-  progress: number;
-};
-
-export type DbTask = {
-  id: string;
-  title: string;
-  done: boolean;
-  agentId: string | null;
-  createdAt: string;
-};
-
-export type DbActivity = {
-  id: string;
-  text: string;
-  agentName: string | null;
-  color: string | null;
-  createdAt: string;
-};
-
-const now = () => new Date().toISOString();
-const uid = () => randomUUID();
-
-function rowToUser(r: Record<string, unknown>): DbUser {
-  return {
-    id: r.id as string,
-    name: r.name as string,
-    email: r.email as string,
-    passwordHash: r.password_hash as string,
-    createdAt: r.created_at as string,
-  };
-}
-
-function rowToAgent(r: Record<string, unknown>): DbAgent {
-  return {
-    id: r.id as string,
-    name: r.name as string,
-    color: r.color as string,
-    status: r.status === "waiting" ? "waiting" : "working",
-    currentTask: r.current_task as string,
-    progress: Number(r.progress ?? 0),
-  };
-}
-
-function rowToTask(r: Record<string, unknown>): DbTask {
-  return {
-    id: r.id as string,
-    title: r.title as string,
-    done: Number(r.done) === 1,
-    agentId: (r.agent_id as string) ?? null,
-    createdAt: r.created_at as string,
-  };
-}
-
-function rowToActivity(r: Record<string, unknown>): DbActivity {
-  return {
-    id: r.id as string,
-    text: r.text as string,
-    agentName: (r.agent_name as string) ?? null,
-    color: (r.color as string) ?? null,
-    createdAt: r.created_at as string,
-  };
-}
-
-export const db = {
-  // Ensures tables exist (also runs automatically on first query).
-  init() {
-    getDb();
-  },
-
-  createUser(name: string, email: string, passwordHash: string): DbUser {
-    const sqlite = getDb();
-    const user: DbUser = { id: uid(), name, email, passwordHash, createdAt: now() };
-    sqlite
-      .prepare(
-        "INSERT INTO users (id, name, email, password_hash, created_at) VALUES (?, ?, ?, ?, ?)"
-      )
-      .run(user.id, user.name, user.email, user.passwordHash, user.createdAt);
-    return user;
-  },
-
-  getUserByEmail(email: string): DbUser | null {
-    const row = getDb()
-      .prepare("SELECT * FROM users WHERE email = ?")
-      .get(email) as Record<string, unknown> | undefined;
-    return row ? rowToUser(row) : null;
-  },
-
-  getUserById(id: string): DbUser | null {
-    const row = getDb()
-      .prepare("SELECT * FROM users WHERE id = ?")
-      .get(id) as Record<string, unknown> | undefined;
-    return row ? rowToUser(row) : null;
-  },
-
-  upsertAgent(a: {
-    name: string;
-    color: string;
-    status: "working" | "waiting";
-    currentTask: string;
-    progress: number;
-  }): DbAgent {
-    const sqlite = getDb();
-    const existing = sqlite
-      .prepare("SELECT * FROM agents WHERE name = ?")
-      .get(a.name) as Record<string, unknown> | undefined;
-    if (existing) {
-      sqlite
-        .prepare(
-          "UPDATE agents SET color = ?, status = ?, current_task = ?, progress = ? WHERE name = ?"
-        )
-        .run(a.color, a.status, a.currentTask, a.progress, a.name);
-      return { ...rowToAgent(existing), ...a };
-    }
-    const agent: DbAgent = { id: uid(), ...a };
-    sqlite
-      .prepare(
-        "INSERT INTO agents (id, name, color, status, current_task, progress) VALUES (?, ?, ?, ?, ?, ?)"
-      )
-      .run(agent.id, agent.name, agent.color, agent.status, agent.currentTask, agent.progress);
-    return agent;
-  },
-
-  listAgents(): DbAgent[] {
-    const rows = getDb()
-      .prepare("SELECT * FROM agents ORDER BY name ASC")
-      .all() as Record<string, unknown>[];
-    return rows.map(rowToAgent);
-  },
-
-  getAgentById(id: string): DbAgent | null {
-    const row = getDb()
-      .prepare("SELECT * FROM agents WHERE id = ?")
-      .get(id) as Record<string, unknown> | undefined;
-    return row ? rowToAgent(row) : null;
-  },
-
-  updateAgent(
-    id: string,
-    data: { status?: "working" | "waiting"; progress?: number; currentTask?: string }
-  ): DbAgent | null {
-    const sqlite = getDb();
-    const existing = this.getAgentById(id);
-    if (!existing) return null;
-    const next = {
-      status: data.status ?? existing.status,
-      progress:
-        typeof data.progress === "number"
-          ? Math.max(0, Math.min(100, Math.round(data.progress)))
-          : existing.progress,
-      currentTask: data.currentTask ?? existing.currentTask,
-    };
-    sqlite
-      .prepare("UPDATE agents SET status = ?, progress = ?, current_task = ? WHERE id = ?")
-      .run(next.status, next.progress, next.currentTask, id);
-    return { ...existing, ...next };
-  },
-
-  listTasks(): DbTask[] {
-    const rows = getDb()
-      .prepare("SELECT * FROM tasks ORDER BY created_at ASC")
-      .all() as Record<string, unknown>[];
-    return rows.map(rowToTask);
-  },
-
-  createTask(title: string, agentId?: string | null): DbTask {
-    const task: DbTask = { id: uid(), title, done: false, agentId: agentId ?? null, createdAt: now() };
-    getDb()
-      .prepare("INSERT INTO tasks (id, title, done, agent_id, created_at) VALUES (?, ?, 0, ?, ?)")
-      .run(task.id, task.title, task.agentId, task.createdAt);
-    return task;
-  },
-
-  getTaskById(id: string): DbTask | null {
-    const row = getDb()
-      .prepare("SELECT * FROM tasks WHERE id = ?")
-      .get(id) as Record<string, unknown> | undefined;
-    return row ? rowToTask(row) : null;
-  },
-
-  setTaskDone(id: string, done: boolean): DbTask | null {
-    const existing = this.getTaskById(id);
-    if (!existing) return null;
-    getDb().prepare("UPDATE tasks SET done = ? WHERE id = ?").run(done ? 1 : 0, id);
-    return { ...existing, done };
-  },
-
-  deleteTask(id: string): boolean {
-    const res = getDb().prepare("DELETE FROM tasks WHERE id = ?").run(id);
-    return (res.changes as number) > 0;
-  },
-
-  countTasks(): number {
-    const row = getDb().prepare("SELECT COUNT(*) AS n FROM tasks").get() as { n: number };
-    return row.n;
-  },
-
-  addActivity(text: string, agentName?: string | null, color?: string | null): DbActivity {
-    const entry: DbActivity = {
-      id: uid(),
-      text,
-      agentName: agentName ?? null,
-      color: color ?? null,
-      createdAt: now(),
-    };
-    getDb()
-      .prepare(
-        "INSERT INTO activity (id, text, agent_name, color, created_at) VALUES (?, ?, ?, ?, ?)"
-      )
-      .run(entry.id, entry.text, entry.agentName, entry.color, entry.createdAt);
-    return entry;
-  },
-
-  listActivity(limit = 20): DbActivity[] {
-    const rows = getDb()
-      .prepare("SELECT * FROM activity ORDER BY created_at DESC LIMIT ?")
-      .all(limit) as Record<string, unknown>[];
-    return rows.map(rowToActivity);
-  },
-
-  countActivity(): number {
-    const row = getDb().prepare("SELECT COUNT(*) AS n FROM activity").get() as { n: number };
-    return row.n;
-  },
+export const db={
+ async listAgents(userId:string){const q=sql(),c=await companyFor(userId);return (await q`select * from agents where company_id=${c} order by created_at`).map(r=>agent(r as Record<string,unknown>));},
+ async getAgentById(userId:string,id:string){const q=sql(),c=await companyFor(userId);const r=await q`select * from agents where id=${id} and company_id=${c} limit 1`;return r[0]?agent(r[0] as Record<string,unknown>):null;},
+ async updateAgent(userId:string,id:string,data:{status?:"working"|"waiting";progress?:number;currentTask?:string}){const q=sql(),c=await companyFor(userId);const old=await this.getAgentById(userId,id);if(!old)return null;const status=data.status??old.status,progress=data.progress??old.progress,currentTask=data.currentTask??old.currentTask;const r=await q`update agents set status=${status},progress=${progress},current_task=${currentTask} where id=${id} and company_id=${c} returning *`;return r[0]?agent(r[0] as Record<string,unknown>):null;},
+ async listTasks(userId:string){const q=sql(),c=await companyFor(userId);return (await q`select * from tasks where company_id=${c} order by created_at`).map(r=>task(r as Record<string,unknown>));},
+ async getTaskById(userId:string,id:string){const q=sql(),c=await companyFor(userId);const r=await q`select * from tasks where id=${id} and company_id=${c} limit 1`;return r[0]?task(r[0] as Record<string,unknown>):null;},
+ async createTask(userId:string,title:string,agentId?:string|null){const q=sql(),c=await companyFor(userId);const r=await q`insert into tasks(company_id,agent_id,title,status,priority,progress) values(${c},${agentId??null},${title},'todo','medium',0) returning *`;return task(r[0] as Record<string,unknown>);},
+ async setTaskDone(userId:string,id:string,done:boolean){const q=sql(),c=await companyFor(userId);const r=await q`update tasks set status=${done?"done":"todo"},progress=${done?100:0},updated_at=now() where id=${id} and company_id=${c} returning *`;return r[0]?task(r[0] as Record<string,unknown>):null;},
+ async deleteTask(userId:string,id:string){const q=sql(),c=await companyFor(userId);const r=await q`delete from tasks where id=${id} and company_id=${c} returning id`;return r.length>0;},
+ async addActivity(userId:string,text:string,agentName?:string|null){const q=sql(),c=await companyFor(userId);const r=await q`insert into activity(company_id,kind,message) values(${c},${agentName??"ZELIO"},${text}) returning *`;return activity(r[0] as Record<string,unknown>);},
+ async listActivity(userId:string,limit=20){const q=sql(),c=await companyFor(userId);const n=Math.max(1,Math.min(50,limit));const rows=await q`select * from activity where company_id=${c} order by created_at desc limit ${n}`;return rows.map(r=>activity(r as Record<string,unknown>));},
 };
