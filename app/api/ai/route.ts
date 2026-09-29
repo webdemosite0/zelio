@@ -27,9 +27,8 @@ export async function POST(req: NextRequest) {
   if (!message) return new Response("Message is required.", { status: 400 });
   if (message.length > 12000) return new Response("Message is too long.", { status: 413 });
 
-  const specialist = body.specialist && body.specialist in SPECIALISTS
-    ? body.specialist
-    : routeSpecialist(message);
+  const requested = typeof body.specialist === "string" ? body.specialist.toLowerCase() : "";
+  const specialist = requested in SPECIALISTS ? requested as SpecialistId : routeSpecialist(message);
 
   const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
