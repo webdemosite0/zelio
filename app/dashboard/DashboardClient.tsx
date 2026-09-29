@@ -222,6 +222,8 @@ export default function DashboardClient({ userName }: { userName: string }) {
               </div>
             </>
           )}
-    </main>
+        </main>
+      </div>
+    </div>
   );
 }
