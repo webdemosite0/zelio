@@ -1,36 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { db } from "@/lib/db";
-import { verifyPassword, signSessionToken, sessionCookieOptions } from "@/lib/auth";
+import { auth } from "@/lib/auth/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  let body: { email?: string; password?: string };
   try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request body." }, { status: 400 });
+    const body = await req.json() as { email?: string; password?: string };
+    const email = (body.email ?? "").trim().toLowerCase();
+    const password = body.password ?? "";
+    const { data, error } = await auth.signIn.email({ email, password });
+    if (error) return NextResponse.json({ error: error.message || "Incorrect email or password." }, { status: 401 });
+    return NextResponse.json({ ok: true, user: data?.user ?? null });
+  } catch (error) {
+    console.error("login failed", error);
+    return NextResponse.json({ error: "Authentication service is temporarily unavailable." }, { status: 502 });
   }
-
-  const email = (body.email ?? "").trim().toLowerCase();
-  const password = body.password ?? "";
-
-  const user = db.getUserByEmail(email);
-  if (!user || !(await verifyPassword(password, user.passwordHash))) {
-    return NextResponse.json(
-      { error: "Incorrect email or password." },
-      { status: 401 }
-    );
-  }
-
-  const token = await signSessionToken(user.id);
-  const store = await cookies();
-  const { name: cookieName, ...opts } = sessionCookieOptions();
-  store.set(cookieName, token, opts);
-
-  return NextResponse.json({
-    ok: true,
-    user: { name: user.name, email: user.email },
-  });
 }
