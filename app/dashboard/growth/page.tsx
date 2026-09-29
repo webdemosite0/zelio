@@ -21,27 +21,27 @@ export default async function GrowthPage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-9 sm:px-6">
-      <p className="text-xs font-extrabold uppercase tracking-[.18em] text-hot-pink">Growth</p>
-      <h1 className="mt-2 text-4xl font-extrabold">Growth command center.</h1>
+      <p className="text-xs font-semibold uppercase tracking-[.18em] text-hot-pink">Growth</p>
+      <h1 className="mt-2 text-[32px] font-semibold tracking-[-.035em]">Growth command center.</h1>
       <p className="mt-2 text-muted">A live operating view for {company.name}.</p>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         <div className="rounded-2xl bg-white p-6">
           <p className="text-sm font-bold text-muted">Tasks completed</p>
-          <p className="mt-2 text-4xl font-extrabold">{completed}</p>
+          <p className="mt-2 text-[32px] font-semibold tracking-[-.035em]">{completed}</p>
         </div>
         <div className="rounded-2xl bg-white p-6">
           <p className="text-sm font-bold text-muted">Open work</p>
-          <p className="mt-2 text-4xl font-extrabold">{tasks.length - completed}</p>
+          <p className="mt-2 text-[32px] font-semibold tracking-[-.035em]">{tasks.length - completed}</p>
         </div>
         <div className="rounded-2xl bg-white p-6">
           <p className="text-sm font-bold text-muted">Active specialists</p>
-          <p className="mt-2 text-4xl font-extrabold">{active}</p>
+          <p className="mt-2 text-[32px] font-semibold tracking-[-.035em]">{active}</p>
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-ink/[.07] bg-white p-6">
-        <h2 className="font-extrabold">Workspace focus</h2>
+      <div className="mt-4 rounded-2xl border border-[#e7e9ef] bg-white shadow-[0_1px_2px_rgba(17,18,26,.025)] p-6">
+        <h2 className="font-semibold">Workspace focus</h2>
         <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-ink/70">
           {String(company.workspaceConfig.focus || "Build, learn and grow.")}
         </p>
