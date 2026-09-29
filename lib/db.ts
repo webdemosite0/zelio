@@ -1,8 +1,9 @@
 import { neon } from "@neondatabase/serverless";
 
 function sql() {
-  if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is not configured.");
-  return neon(process.env.DATABASE_URL);
+  const url = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+  if (!url) throw new Error("DATABASE_URL is not configured.");
+  return neon(url);
 }
 
 const TEAM = [
