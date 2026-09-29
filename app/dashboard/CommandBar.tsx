@@ -75,8 +75,8 @@ export default function CommandBar({
   return (
     <div className="space-y-3">
       {(sending || answer || error) && (
-        <section className="overflow-hidden rounded-[18px] border border-electric-violet/15 bg-white shadow-[0_24px_70px_-38px_rgba(97,87,255,0.55)]">
-          <div className="flex items-center justify-between border-b border-ink/[0.06] bg-gradient-to-r from-electric-blue/[0.08] via-plasma-purple/[0.08] to-hot-pink/[0.08] px-5 py-3.5">
+        <section className="overflow-hidden rounded-[14px] border border-[var(--z-line)] bg-white shadow-[var(--z-shadow-low)]">
+          <div className="flex items-center justify-between border-b border-[var(--z-line)] bg-[#fafafa] px-5 py-3.5">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2.5 w-2.5">
                 {sending ? <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-electric-violet opacity-50" /> : null}
@@ -86,7 +86,7 @@ export default function CommandBar({
                 {specialist ? `${specialist.name} specialist` : "ZELIO is routing the work…"}
               </p>
             </div>
-            <span className="rounded-full bg-white/80 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-electric-violet">
+            <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted">
               GPT-6 Luna
             </span>
           </div>
@@ -109,9 +109,9 @@ export default function CommandBar({
 
       <form
         onSubmit={onSubmit}
-        className="flex items-center gap-3 rounded-[14px] border border-electric-violet/15 bg-white p-2.5 pl-3 shadow-[0_18px_50px_-28px_rgba(97,87,255,0.5)] transition-all duration-200 focus-within:border-electric-violet/35 focus-within:shadow-[0_24px_60px_-26px_rgba(97,87,255,0.55)]"
+        className="flex items-center gap-3 rounded-[12px] border border-[var(--z-line)] bg-white p-2 pl-2.5 shadow-[var(--z-shadow-low)] transition focus-within:border-[#aaa4ff] focus-within:shadow-[0_0_0_3px_var(--z-focus)]"
       >
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-gradient-to-br from-electric-blue via-electric-violet to-hot-pink text-white shadow-sm">
+        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-[#6157ff] text-white">
           <svg viewBox="0 0 20 20" className="h-4.5 w-4.5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M10 2.5v3M10 14.5v3M2.5 10h3M14.5 10h3M4.7 4.7l2.1 2.1M13.2 13.2l2.1 2.1M15.3 4.7l-2.1 2.1M6.8 13.2l-2.1 2.1" />
           </svg>
@@ -128,7 +128,7 @@ export default function CommandBar({
           type="submit"
           aria-label="Send command"
           disabled={sending || !value.trim()}
-          className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-[10px] bg-ink px-4 text-sm font-bold text-white transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[var(--z-shadow-mid)] active:scale-95 disabled:translate-y-0 disabled:opacity-50"
+          className="group inline-flex h-10 shrink-0 items-center gap-2 rounded-[10px] bg-ink px-4 text-sm font-semibold text-white transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[var(--z-shadow-mid)] active:scale-95 disabled:translate-y-0 disabled:opacity-50"
         >
           {sending ? "Working" : "Run"}
           <span aria-hidden="true" className="transition-transform group-hover:translate-x-0.5">→</span>
