@@ -50,7 +50,7 @@ export default function Navbar() {
         {/* Right actions */}
         <div className="hidden items-center gap-3 md:flex">
           <a
-            href="#get-started"
+            href="/login"
             className="text-sm font-medium text-ink/80 transition-colors hover:text-ink"
           >
             Sign in
@@ -117,7 +117,7 @@ export default function Navbar() {
               </a>
             ))}
             <a
-              href="#get-started"
+              href="/login"
               onClick={() => setOpen(false)}
               className="rounded-lg px-2 py-2.5 text-[15px] font-medium text-ink/80 hover:bg-mist"
             >
