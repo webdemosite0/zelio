@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
-import { SESSION_COOKIE } from "@/lib/auth";
+import { auth } from "@/lib/auth/server";
 
 export const dynamic = "force-dynamic";
 
 export async function POST() {
-  const store = await cookies();
-  store.delete(SESSION_COOKIE);
+  await auth.signOut();
   return NextResponse.json({ ok: true });
 }
