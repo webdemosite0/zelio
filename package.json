@@ -11,12 +11,12 @@
     "db:seed": "tsx db/seed.ts"
   },
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "jose": "^6.2.12",
     "next": "16.3.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "openai": "^6.16.0"
+    "openai": "^6.16.0",
+    "@neondatabase/auth": "^0.2.0",
+    "@neondatabase/serverless": "^1.0.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
