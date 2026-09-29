@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { NextRequest } from "next/server";
-import { getSessionUser } from "@/lib/auth";
+import { getSessionUser } from "@/lib/auth/server";
 import { routeSpecialist, specialistInstructions, SPECIALISTS, type SpecialistId } from "@/lib/ai/prompts";
 
 export const runtime = "nodejs";
